@@ -16,6 +16,11 @@ export default class Planet extends EventEmitter {
         this.populate();
     }
 
+    handlerPlanet() {
+        this.emit(StarWarsUniverse.events.UNIVERSE_POPULATED);
+    }
+
+
     static get events() {
 
         return {
@@ -28,38 +33,58 @@ export default class Planet extends EventEmitter {
         return this.population.length;
     }
 
-    async populate() {
-        await fetch('https://swapi.boom.dev/api/planets?page=1')
+    populate() {
+        fetch('https://swapi.boom.dev/api/planets?page=1')
             .then(response => response.json())
             .then(data => {
 
                 data.results.map(i => {
 
+                    // console.log(data)
+
                     for (var element in i.residents) {
                         if (this.population.length < 10) {
                             this.population.push(i.residents[element])
-                            // this.emit(Planet.events.PERSON_BORN);
+                            this.emit(Planet.events.PERSON_BORN);
 
                             fetch(i.residents[element])
                                 .then(response => response.json())
                                 .then(data => {
 
-                                    console.log(data)
                                     if (this.peopleData.length < 10) {
+
+                                        let human = new Person(data.name, data.height, data.mass)
+                                        this.emit(Planet.events.PERSON_BORN);
+
+                                        // console.log(human)
                                         this.peopleData.push(data)
-                                        console.log(this.peopleData.length)
+                                        this.population.push(human)
+
+                                        // setTimeout(function () {
+
+                                        // }, 1000);
+
 
                                     }
-                                });
+
+                                })
+
 
                         }
                     }
 
                     this.emit(Planet.events.POPULATING_COMPLETED);
+                    this.emit(Planet.events.POPULATING_COMPLETED, this.handlerPlanet);
+                    // this.emit(StarWarsUniverse.events.UNIVERSE_POPULATED);
+
+                    // console.log(this.populationCount)
+
                 })
             });
 
-        console.log(this.peopleData.length)
+        // console.log(this.populationCount)
+      
+
 
 
     }

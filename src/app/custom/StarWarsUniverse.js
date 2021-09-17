@@ -77,6 +77,7 @@ export default class StarWarsUniverse extends EventEmitter {
 
             });
 
+
         // console.log(this.films)
     }
 }
